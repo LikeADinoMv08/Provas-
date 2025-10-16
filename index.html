@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste Protegido</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+    }
+    
+    .alerta-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #d32f2f;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      z-index: 10000;
+      display: none;
+      animation: slideDown 0.3s ease-in;
+    }
+    
+    .alerta-container.ativo {
+      display: block;
+    }
+    
+    @keyframes slideDown {
+      from { transform: translateY(-100%); }
+      to { transform: translateY(0); }
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      margin-top: 60px;
+    }
+    
+    .info-teste {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid #1976d2;
+    }
+    
+    .info-teste h2 {
+      color: #1976d2;
+      margin-bottom: 10px;
+    }
+    
+    .info-teste ul {
+      margin-left: 20px;
+      color: #666;
+    }
+    
+    .info-teste li {
+      margin: 8px 0;
+    }
+    
+    .aviso {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      padding: 12px;
+      border-radius: 4px;
+      color: #856404;
+      margin-top: 10px;
+    }
+    
+    .botao-abrir {
+      display: inline-block;
+      background: #1976d2;
+      color: white;
+      padding: 12px 30px;
+      border-radius: 4px;
+      text-decoration: none;
+      margin-top: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+    
+    .botao-abrir:hover {
+      background: #1565c0;
+    }
+    
+    .contador-abas {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      padding: 15px 20px;
+      border-radius: 50%;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      font-weight: bold;
+      color: #1976d2;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="alerta-container" id="alerta">
+    ⚠️ Você saiu desta aba! Retorne para continuar o teste.
+  </div>
+  
+  <div class="container">
+    <div class="info-teste">
+      <h2>📋 Instruções Importantes</h2>
+      <p><strong>Não é permitido:</strong></p>
+      <ul>
+        <li>✗ Abrir outras abas (Ctrl+T)</li>
+        <li>✗ Abrir novas janelas (Ctrl+N)</li>
+        <li>✗ Fechar esta aba (Ctrl+W)</li>
+        <li>✗ Mudar para outra aba durante o teste</li>
+      </ul>
+      <div class="aviso">
+        <strong>⚠️ Aviso:</strong> Se você sair desta aba, um alerta será exibido. Múltiplas tentativas podem resultar no cancelamento da avaliação.
+      </div>
+      
+      <button class="botao-abrir" onclick="abrirFormulario()">
+        ➜ Abrir Formulário Protegido
+      </button>
+    </div>
+  </div>
+  
+  <div class="contador-abas" id="contador">
+    Abas saídas: 0
+  </div>
+  
+  <script>
+    let contadorSaidas = 0;
+    let urlFormulario = "https://docs.google.com/forms/d/e/1FAIpQLScNQBacsNUzyRdnQzaeNEW3KVINXpnpW8wNTxNTOKQytr-09w/viewform";
+    
+    function abrirFormulario() {
+      window.open(urlFormulario, '_blank');
+    }
+    
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        contadorSaidas++;
+        document.getElementById('alerta').classList.add('ativo');
+        document.getElementById('contador').textContent = 'Abas saídas: ' + contadorSaidas;
+        
+        if (contadorSaidas >= 3) {
+          alert('⚠️ Você saiu da aba várias vezes. Sua sessão pode ser cancelada!');
+        }
+      } else {
+        setTimeout(() => {
+          document.getElementById('alerta').classList.remove('ativo');
+        }, 2000);
+      }
+    });
+    
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 't') {
+        e.preventDefault();
+        alert('❌ Não é permitido abrir outras abas!');
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'w') {
+        e.preventDefault();
+        alert('❌ Não é permitido fechar!');
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+        e.preventDefault();
+        alert('❌ Não é permitido abrir novas janelas!');
+      }
+    });
+    
+    window.addEventListener('beforeunload', function(e) {
+      e.preventDefault();
+      e.returnValue = 'Você tem um teste em andamento!';
+    });
+  </script>
+</body>
+</html>
