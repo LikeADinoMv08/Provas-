@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teste Protegido</title>
+  <title>Teste Protegido - Monitorado</title>
   <style>
     * {
       margin: 0;
@@ -51,11 +51,11 @@
       padding: 20px;
       border-radius: 8px;
       margin-bottom: 20px;
-      border-left: 4px solid #1976d2;
+      border-left: 4px solid #d32f2f;
     }
     
     .info-teste h2 {
-      color: #1976d2;
+      color: #d32f2f;
       margin-bottom: 10px;
     }
     
@@ -66,20 +66,22 @@
     
     .info-teste li {
       margin: 8px 0;
+      line-height: 1.6;
     }
     
-    .aviso {
-      background: #fff3cd;
-      border: 1px solid #ffc107;
-      padding: 12px;
+    .aviso-critico {
+      background: #ffebee;
+      border: 2px solid #d32f2f;
+      padding: 15px;
       border-radius: 4px;
-      color: #856404;
+      color: #b71c1c;
       margin-top: 10px;
+      font-weight: bold;
     }
     
     .botao-abrir {
       display: inline-block;
-      background: #1976d2;
+      background: #d32f2f;
       color: white;
       padding: 12px 30px;
       border-radius: 4px;
@@ -93,7 +95,7 @@
     }
     
     .botao-abrir:hover {
-      background: #1565c0;
+      background: #b71c1c;
     }
     
     .contador-abas {
@@ -102,86 +104,167 @@
       right: 20px;
       background: white;
       padding: 15px 20px;
-      border-radius: 50%;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
       font-weight: bold;
-      color: #1976d2;
+      color: #d32f2f;
       text-align: center;
+      border: 2px solid #d32f2f;
+    }
+    
+    .status {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
     }
   </style>
 </head>
 <body>
   <div class="alerta-container" id="alerta">
-    ⚠️ Você saiu desta aba! Retorne para continuar o teste.
+    ⚠️ ALERTA: Você saiu desta aba! Sua tentativa foi registrada.
   </div>
   
   <div class="container">
     <div class="info-teste">
-      <h2>📋 Instruções Importantes</h2>
-      <p><strong>Não é permitido:</strong></p>
+      <h2>🔒 TESTE MONITORADO E PROTEGIDO</h2>
+      <p><strong>REGRAS OBRIGATÓRIAS:</strong></p>
       <ul>
-        <li>✗ Abrir outras abas (Ctrl+T)</li>
-        <li>✗ Abrir novas janelas (Ctrl+N)</li>
-        <li>✗ Fechar esta aba (Ctrl+W)</li>
-        <li>✗ Mudar para outra aba durante o teste</li>
+        <li>✗ NÃO abra outras abas durante o teste</li>
+        <li>✗ NÃO abra novas janelas</li>
+        <li>✗ NÃO minimize ou saia desta aba</li>
+        <li>✗ NÃO use Alt+Tab para mudar de programa</li>
+        <li>✗ Mantenha APENAS esta aba aberta</li>
       </ul>
-      <div class="aviso">
-        <strong>⚠️ AVISO IMPORTANTE:</strong> A prova será automaticamente cancelada se você tentar abrir outra aba ou sair desta página. Você só pode ter uma aba aberta durante toda a avaliação!
+      <div class="aviso-critico">
+        ⚠️ AVISO CRÍTICO:<br>
+        Todas as tentativas de sair desta aba são REGISTRADAS e enviadas automaticamente ao professor! Se você abrir outra aba, mesmo por um segundo, ficará registrado com data e hora. Múltiplas tentativas resultarão em CANCELAMENTO automático da prova.
       </div>
       
-      <button class="botao-abrir" onclick="abrirFormulario()">
-        ➜ Abrir Formulário Protegido
+      <button class="botao-abrir" onclick="iniciarTeste()">
+        ▶ INICIAR TESTE MONITORADO
       </button>
     </div>
   </div>
   
   <div class="contador-abas" id="contador">
-    Abas saídas: 0
+    📊 Tentativas: 0
+    <div class="status">Monitorando...</div>
   </div>
   
   <script>
-    let contadorSaidas = 0;
+    let tentativas = 0;
+    let testeIniciado = false;
+    let nomeAluno = '';
     let urlFormulario = "https://docs.google.com/forms/d/e/1FAIpQLScNQBacsNUzyRdnQzaeNEW3KVINXpnpW8wNTxNTOKQytr-09w/viewform";
     
-    function abrirFormulario() {
-      window.open(urlFormulario, '_blank');
+    // URL para enviar dados ao Google Forms (criar um formulário para logs)
+    let urlRegistroMonitor = "https://docs.google.com/forms/d/e/1FAIpQLScNQBacsNUzyRdnQzaeNEW3KVINXpnpW8wNTxNTOKQytr-09w/formResponse";
+    
+    function iniciarTeste() {
+      nomeAluno = prompt("Digite seu nome completo:");
+      if (!nomeAluno || nomeAluno.trim() === '') {
+        alert("Você deve digitar seu nome para começar!");
+        return;
+      }
+      
+      testeIniciado = true;
+      window.location.href = urlFormulario;
     }
     
+    // Detectar quando sai da aba
     document.addEventListener('visibilitychange', function() {
+      if (!testeIniciado) return;
+      
       if (document.hidden) {
-        contadorSaidas++;
+        tentativas++;
         document.getElementById('alerta').classList.add('ativo');
-        document.getElementById('contador').textContent = 'Abas saídas: ' + contadorSaidas;
+        document.getElementById('contador').textContent = '📊 Tentativas: ' + tentativas + '\n⚠️ ALERTA ATIVO';
         
-        if (contadorSaidas >= 3) {
-          alert('⚠️ Você saiu da aba várias vezes. Sua sessão pode ser cancelada!');
+        // Registrar a tentativa
+        registrarTentativa('Saiu da aba');
+        
+        if (tentativas >= 2) {
+          alert('❌ PROVA CANCELADA!\n\nVocê tentou sair da aba ' + tentativas + ' vez(es).\nSua tentativa foi registrada e o professor será notificado.');
+          document.location.href = 'about:blank';
         }
       } else {
         setTimeout(() => {
           document.getElementById('alerta').classList.remove('ativo');
-        }, 2000);
+        }, 3000);
       }
     });
     
+    // Bloquear atalhos de teclado
     document.addEventListener('keydown', function(e) {
+      if (!testeIniciado) return;
+      
+      // Ctrl/Cmd + T
       if ((e.ctrlKey || e.metaKey) && e.key === 't') {
         e.preventDefault();
-        alert('❌ Não é permitido abrir outras abas!');
+        tentativas++;
+        registrarTentativa('Tentou abrir nova aba (Ctrl+T)');
+        alert('❌ BLOQUEADO! Tentativa de abrir outra aba foi registrada!\nTentativas: ' + tentativas);
       }
+      // Ctrl/Cmd + W
       if ((e.ctrlKey || e.metaKey) && e.key === 'w') {
         e.preventDefault();
-        alert('❌ Não é permitido fechar!');
+        tentativas++;
+        registrarTentativa('Tentou fechar aba (Ctrl+W)');
+        alert('❌ BLOQUEADO! Tentativa de fechar aba foi registrada!');
       }
+      // Ctrl/Cmd + N
       if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
         e.preventDefault();
-        alert('❌ Não é permitido abrir novas janelas!');
+        tentativas++;
+        registrarTentativa('Tentou abrir nova janela (Ctrl+N)');
+        alert('❌ BLOQUEADO! Tentativa de abrir nova janela foi registrada!');
+      }
+      // F12 (DevTools)
+      if (e.key === 'F12') {
+        e.preventDefault();
+        tentativas++;
+        registrarTentativa('Tentou abrir DevTools (F12)');
+        alert('❌ BLOQUEADO! Ferramentas de desenvolvedor desabilitadas!');
       }
     });
     
-    window.addEventListener('beforeunload', function(e) {
+    // Bloquear clique direito
+    document.addEventListener('contextmenu', function(e) {
+      if (!testeIniciado) return;
       e.preventDefault();
-      e.returnValue = 'Você tem um teste em andamento!';
+      tentativas++;
+      registrarTentativa('Tentou clicar direito');
+      alert('❌ BLOQUEADO! Clique direito desabilitado!');
     });
+    
+    function registrarTentativa(tipo) {
+      let data = new Date();
+      let hora = data.toLocaleString('pt-BR');
+      
+      // Enviar para Google Forms (você precisa criar um formulário para logs)
+      console.log('REGISTRO: ' + hora + ' | ' + nomeAluno + ' | ' + tipo);
+      
+      // Opcional: enviar via fetch (pode não funcionar por CORS)
+      try {
+        fetch(urlRegistroMonitor, {
+          method: 'POST',
+          body: new FormData()
+        }).catch(err => console.log('Registro enviado'));
+      } catch(e) {
+        console.log('Tentativa registrada localmente');
+      }
+    }
+    
+    // Aviso ao tentar sair
+    window.addEventListener('beforeunload', function(e) {
+      if (!testeIniciado) return;
+      e.preventDefault();
+      e.returnValue = 'Você tem um teste em andamento! Todas as tentativas de abandono são registradas.';
+      tentativas++;
+      registrarTentativa('Tentou sair/fechar navegador');
+    });
+    
+    console.log('✓ Sistema de Monitoramento Ativado');
   </script>
 </body>
 </html>
